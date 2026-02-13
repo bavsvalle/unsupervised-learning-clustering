@@ -1,0 +1,2 @@
+# Forçar todos os arquivos .py a serem reconhecidos como Python no GitHub
+*.py linguist-language=Python
