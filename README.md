@@ -40,3 +40,15 @@ Este projeto tem como objetivo realizar Análise Exploratória de Dados(EDA) das
 5. **Próximos passos**
     - Comparação com outros critérios de ligação (Average e Complete Linkage)
     - Comparação com método não hierárquico (K-Means) para avaliar robustez dos agrupamentos
+  
+## 📁 Estrutura do Repositório
+
+      ul-biodiesel-clustering/
+      │
+      ├── data/            # Dados brutos utilizados no projeto
+      ├── outputs/         # Gráficos gerados (histogramas, boxplots, dendrogramas)
+      ├── src/             # Scripts Python com ETL, EDA e Clustering
+      │
+      ├── .gitattributes
+      └── README.md
+
