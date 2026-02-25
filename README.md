@@ -4,42 +4,49 @@
 ![Scikit--Learn](https://img.shields.io/badge/Scikit--Learn-F7931E?logo=scikitlearn&logoColor=white)
 ![Plotly](https://img.shields.io/badge/Plotly-3F4F75?logo=plotly&logoColor=white)
 ![Spyder](https://img.shields.io/badge/Spyder-FF0000?logo=spyderide&logoColor=white)
+![Matplotlib](https://img.shields.io/badge/Matplotlib-11557C?logo=matplotlib&logoColor=white)
 
-# Unsupervised Machine Learning - Clustering de Dados Públicos sobre Biodiesel no Brasil
+# Unsupervised Machine Learning - Clusterização da Produção de Biodiesel
 
-Este projeto tem como objetivo realizar Análise Exploratória de Dados(EDA) das **Matérias-Primas utilizadas na Produção de Biodiesel no Brasil**, a partir de dados abertos do [Governo Federal](https://dados.gov.br/home)
+Este projeto tem como objetivo identificar padrões e concentração na produção de matérias-primas do biodiesel no Brasil utilizando clusterização hierárquica, a partir de dados abertos do [Governo Federal](https://dados.gov.br/home)
 
 ## 📊 Etapas do Projeto
 1. **Coleta dos Dados**  
    - Fonte: [Painéis de Produção de Etanol e de Biodiesel](https://dados.gov.br/dados/conjuntos-dados/paineis-de-producao-de-etanol-e-de-biodiesel)
       - Arquivo: Matéria-Prima utilizadas na Produção de Biodiesel (CSV)
    
-2. **Tratamento (ETL) com Python**  
-   - Limpeza e padronização (remoção de acentos com *Unidecode*, ajuste de datas e nomes de colunas, entre outros) 
-   - Manipulação e transformação de dados com **pandas**  
-   - Uso do **Spyder** para processamento
-
-3. **Análise Exploratória de Dados (EDA)**
-   - Visualização da distribuição da variável quantitativa quantidade_m3:
-     - Histograma: hist_quantidade_m3_30.html
-     - Boxplot: boxplot_quantidade_m3.html
-     - Identificação de outliers globais
-   - Estatísticas descritivas básicas (média, desvio padrão, quartis)
-   - Padronização dos dados usando Z-score para uniformizar escalas
-
-4. **Clustering / Agrupamento de Dados**
+2. **Metodologia**  
+   - Limpeza e padronização dos dados (Python + Pandas)
+   - Padronização da variável quantidade_m3 (Z-score)
    - Cluster Hierárquico Aglomerativo
-      - Métrica: Euclidiana
-      - Linkage: Single
-      - Visualização: dendrograma completo e truncado (últimos 30 clusters)
-      - Linha de corte para definição de clusters com outliers destacados
-    - Observações:  
-    Cluster 1 possui apenas 7 observações — correspondem a outliers globais  
-    Cluster 0 possui mais de 4.000 observações — representa a maioria dos dados  
-    Estatísticas por cluster foram analisadas para identificar padrões de escala
-5. **Próximos passos**
-    - Comparação com outros critérios de ligação (Average e Complete Linkage)
-    - Comparação com método não hierárquico (K-Means) para avaliar robustez dos agrupamentos
+      - Single Linkage
+      - Complete Linkage
+      - Average Linkage
+   - Análise por dendrogramas e estatísticas por clusters
+
+3. **Conclusão comparativa entre métodos**
+   - Single Linkage
+      - Cluster 1 reúne os maiores volumes de produção
+      - Todos os valores estão acima do percentil 99% da base geral
+      - Óleo de soja representa aproximadamente 85% dos registros
+      - Mediana do cluster (143.904 m³) é ~77x maior que a mediana geral (1.849 m³)
+   - Complete Linkage
+      - Cluster 1 concentra os maiores volumes, acima do percentil 95% da base
+      - Forte predominância do óleo de soja (99% dos registros)
+      - Mediana ~50x maior que a mediana geral.
+   - Average Linkage
+      - Cluster 0 reúne volumes acima do percentil 95%, com forte presença acima do 99%.
+      - Predominância do óleo de soja (99% dos registros).
+      - Mediana ~40x maior que a mediana geral
+      - A análise temporal indica:
+         - Crescimento da produção média entre 2017 e 2021.
+         - Queda pontual em 2022.
+         - Retomada em 2023, mesmo com menor número de observações.
+
+4. **Síntese Geral**
+   - Em todos os métodos, os maiores volumes estão concentrados em poucos registros
+   - O óleo de soja domina os clusters de alta escala
+   - A diferença expressiva entre medianas confirma alta heterogeneidade e concentração produtiva
   
 ## 📁 Estrutura do Repositório
 
