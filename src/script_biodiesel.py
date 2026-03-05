@@ -130,6 +130,8 @@ plt.axhline(y=0.25, color='red', linestyle='--') # Utilizando valor 0,25 como li
 plt.title('Dendrograma - Single Linkage (Truncado)')
 plt.xlabel('Clusters')
 plt.ylabel('Distância')
+
+plt.savefig('../outputs/dendrograma_single_truncado.png', dpi=600, bbox_inches='tight')
 plt.show()
 # Realizado corte horizontal no dendrograma na altura 0,25, correspondente à formação de 2 clusters
 
@@ -202,6 +204,8 @@ plt.axhline(y=6, color='red', linestyle='--') # Utilizando valor 6 como linha de
 plt.title('Dendrograma - Complete Linkage (Truncado)')
 plt.xlabel('Clusters')
 plt.ylabel('Distância')
+
+plt.savefig('../outputs/dendrograma_comp_truncado.png', dpi=600, bbox_inches='tight')
 plt.show()
 # Realizado corte horizontal no dendrograma na altura 6, correspondente à formação de 2 clusters
 
@@ -272,6 +276,8 @@ plt.axhline(y=3, color='red', linestyle='--') # Utilizando valor 3 como linha de
 plt.title('Dendrograma - Average Linkage (Truncado)')
 plt.xlabel('Clusters')
 plt.ylabel('Distância')
+
+plt.savefig('../outputs/dendrograma_aver_truncado.png', dpi=600, bbox_inches='tight')
 plt.show()
 # Realizado corte horizontal no dendrograma na altura 3, correspondente à formação de 2 clusters
 
@@ -339,6 +345,8 @@ plt.xlabel('Número de Clusters (K)')
 plt.ylabel('WCSS')
 plt.title('Método do Elbow')
 plt.xticks(K)
+
+plt.savefig('../outputs/kmeans_elbow.png', dpi=600, bbox_inches='tight')
 plt.show()
 
 # Método Silhueta para identificação do nº de clusters
@@ -359,6 +367,8 @@ plt.xlabel('Número de Clusters (K)')
 plt.ylabel('Coeficiente de Silhueta')
 plt.title('Coeficiente Médio de Silhueta')
 plt.xticks(K)
+
+plt.savefig('../outputs/kmeans_silhueta.png', dpi=600, bbox_inches='tight')
 plt.show()
 
 # Obs: Resultados convergem o numero de clusters apresentado no metodo aglomerativo, cluster = 2.
@@ -412,6 +422,8 @@ plt.yticks([])
 plt.xlabel('Quantidade (m³)')
 plt.title('Clusters e Centróides - KMeans')
 plt.legend()
+
+plt.savefig('../outputs/kmeans_centroides.png', dpi=600, bbox_inches='tight')
 plt.show()
 
 #       Análise Cluster 1 (266 observacoes) 
