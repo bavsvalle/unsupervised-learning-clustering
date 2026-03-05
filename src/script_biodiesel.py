@@ -1,15 +1,21 @@
-# Importação pacotes
+#%% Importação pacotes
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
 import scipy.cluster.hierarchy as sch
 from scipy.stats import zscore
 from scipy.spatial.distance import pdist 
 from sklearn.cluster import AgglomerativeClustering
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
+import pingouin as pg
 import plotly.express as px 
 import plotly.io as pio
 pio.renderers.default='browser'
 
-## Leitura arquivo csv
+#%% Análise e padronização do arquivo
+
+# Leitura arquivo csv
 df_mp_original = pd.read_csv("../data/biodiesel-materia-prima.csv")
 
 # Verificando as primeiras 5 linhas do dataframe
@@ -59,7 +65,7 @@ df_mp_original['mes'] = pd.to_datetime(df_mp_original['mes/ano'], format='%m/%Y'
 df_mp_original['ano'] = pd.to_datetime(df_mp_original['mes/ano'], format='%m/%Y').dt.year
 df_mp_original.head()
 
-## Dispersao dos dados
+#%% Dispersao dos dados
 # Histograma
 fig_hist = px.histogram(
     df_mp_original,
@@ -79,8 +85,7 @@ fig_box = px.box(
 fig_box.write_html('boxplot_quantidade_m3.html')
 # Obs: Tanto pelo hisograma quanto pelo boxplot, verifiquei escala divergente entre os dados
 
-
-## Padronização pelo Z score para adequação de escala
+# Padronização pelo Z score para adequação de escala
 col_quant = df_mp_original[['quantidade_m3']] # Selecionei apenas coluna quantitativa e mantive como df [[]] 
 
 type(col_quant)
@@ -96,9 +101,7 @@ df_mp_pad.head()
 print(round(df_mp_pad.mean(), 2))
 print(round(df_mp_pad.std(), 2))
 
-### Cluster Hierárquico Aglomerativo
-
-## Configurando modelo 1 de clusterização: métrica similaridade Dist Euclidiana e método encadeamento Single Linkage
+#%% Modelo 1 - Cluster Hierárquico Aglomerativo: métrica similaridade Dist Euclidiana e método encadeamento Single Linkage
 
 # Gerando Dendograma
 dist_euclidiana = pdist(df_mp_pad, metric='euclidean')
@@ -148,7 +151,6 @@ df_mp_original['cluster_sing'].value_counts()
 # Indicando possivelmente outliers - a ser realizada análise na sequência.
 
 # Análise Cluster 1 (7 valores)
-
 df_mp_original.groupby('cluster_sing')['quantidade_m3'].describe()
 df_mp_original.columns
 df_mp_original.loc[
@@ -174,7 +176,7 @@ df_soja_cluster1_sing.groupby('ano')['quantidade_m3'].agg(['count', 'mean', 'max
 # Além disso, o óleo de milho corresponde ao maior valor registrado tanto dentro do cluster quanto em toda a base de dados.
 # A diferença entre a mediana do cluster (143.904. m³) e a mediana geral (1.849 m³) — cerca de 77 vezes maior — mostra que os dados são bastante heterogêneos, com a produção concentrada em poucas observações de grande escala.
 
-## Configurando modelo 2 de clusterizacao - métrica similaridade Dist Euclidiana e método encadeamento Complete Linkage
+#%% Modelo 2 - Cluster Hierárquico Aglomerativo: métrica similaridade Dist Euclidiana e método encadeamento Complete Linkage
 
 # Gerando Dendograma
 Z_comp = sch.linkage(df_mp_pad, method='complete', metric='euclidean') # Matriz de aglomeracao hierarquica
@@ -217,8 +219,7 @@ df_mp_original['cluster_compl'].value_counts()
 # Obs: Cluster 1 é composto por 118 observações, enquanto Cluster 0 concentra 4.627 registros.
 # Houve aumento do n de observações no Cluster 1 em relação ao método simple linkage, porém permanece sendo um grupo minoritário, já que abrange 2,49% de observações da base de dados.
 
-# Análise Cluster 1 (7 valores)
-
+# Análise Cluster 1 (118 observacoes)
 df_mp_original.groupby('cluster_compl')['quantidade_m3'].describe()
 df_mp_original.loc[
     df_mp_original['cluster_compl'] == 1,
@@ -245,7 +246,7 @@ df_mp_original['quantidade_m3'].describe(percentiles=[0.90,0.95,0.99])
 # Além disso, o óleo de milho corresponde ao maior valor registrado tanto dentro do cluster quanto em toda a base de dados.
 # A diferença entre a mediana do cluster (96.327 m³) e a mediana geral (1.849 m³) — cerca de 50 vezes maior — mostra que os dados são bastante heterogêneos, com a produção concentrada em poucas observações de grande escala.
 
-## Configurando modelo 3 de clusterizacao - métrica similaridade Dist Euclidiana e método encadeamento Average Linkage
+#%% Modelo 3 - Cluster Hierárquico Aglomerativo: métrica similaridade Dist Euclidiana e método encadeamento Average Linkage
 
 # Gerando Dendograma
 Z_aver = sch.linkage(df_mp_pad, method='average', metric='euclidean') # Matriz de aglomeracao hierarquica
@@ -274,7 +275,7 @@ plt.ylabel('Distância')
 plt.show()
 # Realizado corte horizontal no dendrograma na altura 3, correspondente à formação de 2 clusters
 
-# Configurando cluster average
+# Configurando cluster Average
 cluster_aver = AgglomerativeClustering(
                 n_clusters=2,
                 metric='euclidean',
@@ -288,6 +289,7 @@ df_mp_original['cluster_aver'].value_counts()
 # Obs: Cluster 0 é composto por 276 observações, enquanto Cluster 1 concentra 4.469 registros.
 # Houve aumento do n de observações no Cluster 0 em relação ao método simple linkage e ao complete linkage, porém permanece sendo um grupo minoritário, já que abrange 5,81% de observações da base de dados.
 
+# Análise Cluster 0 (276 observacoes)
 df_mp_original.groupby('cluster_aver')['quantidade_m3'].describe()
 df_mp_original.loc[
     (df_mp_original['cluster_aver'] == 0),
@@ -316,6 +318,114 @@ df_mp_original['quantidade_m3'].describe(percentiles=[0.90,0.95,0.99])
 # Além disso, o óleo de milho corresponde ao maior valor registrado tanto dentro do cluster quanto em toda a base de dados.
 # A diferença entre a mediana do cluster (96.327 m³) e a mediana geral (1.849 m³) — cerca de 40 vezes maior — mostra que os dados são bastante heterogêneos, com a produção concentrada em poucas observações de grande escala.
 
+#%% Modelo 4 - Cluster Hierárquico Não Aglomerativo K-means
 
+# Identificação da quantidade de clusters
 
+# Método Elbow para identificação do nº de clusters
+# Observar o "cotovelo" para verificar n de clusters. Quanto menor o WCSS, mais prox as obs estao do seu proprio centroide
+elbow = []
+K = range(1,6)  # você pode aumentar se quiser
+
+for k in K:
+    kmeansElbow = KMeans(n_clusters=k, init='k-means++', random_state=100)
+    kmeansElbow.fit(df_mp_pad[['quantidade_m3']])
+    elbow.append(kmeansElbow.inertia_)
+
+# Plotando
+plt.figure(figsize=(8,5), dpi=600)
+plt.plot(K, elbow, marker='o')
+plt.xlabel('Número de Clusters (K)')
+plt.ylabel('WCSS')
+plt.title('Método do Elbow')
+plt.xticks(K)
+plt.show()
+
+# Método Silhueta para identificação do nº de clusters
+# Coeficiente silhueta - valores próximos de 1 indicativos de melhor separação e coesão entre os grupos. Maior = melhor.
+silhouette_scores = []
+K = range(2,6)
+
+for k in K:
+    kmeans = KMeans(n_clusters=k, init='k-means++', random_state=100)
+    labels = kmeans.fit_predict(df_mp_pad[['quantidade_m3']])
+    score = silhouette_score(df_mp_pad[['quantidade_m3']], labels)
+    silhouette_scores.append(score)
+
+# Plot
+plt.figure(figsize=(8,5), dpi=600)
+plt.plot(K, silhouette_scores, marker='o')
+plt.xlabel('Número de Clusters (K)')
+plt.ylabel('Coeficiente de Silhueta')
+plt.title('Coeficiente Médio de Silhueta')
+plt.xticks(K)
+plt.show()
+
+# Obs: Resultados convergem o numero de clusters apresentado no metodo aglomerativo, cluster = 2.
+
+# Criando modelo Kmeans com 2 clusters
+kmeans = KMeans(n_clusters=2, init='k-means++', random_state=100) # Escolhi 2 clusters, k-means++ já pula para resultados iniciais melhores, 100 garante reprodutibilidade
+clusters_kmeans = kmeans.fit_predict(df_mp_pad[['quantidade_m3']]) # Calcula o centroide e atribui obs ao centroide mais proximo. fit ajusta o modelo aos dados e predict retorna o cluster de cada observação
+
+# Gerando variável para identificar clusters gerados
+df_mp_original['cluster_k'] = clusters_kmeans
+df_mp_original['cluster_kmeans'] = df_mp_original['cluster_k'].astype('category')
+
+df_mp_original['cluster_kmeans'].value_counts()
+
+# Obs: Cluster 1 é composto por 266 observações, enquanto cluster 0 contém 4.479 observações
+
+# Identificando Centróides em Z-score (uso interno do modelo)
+cent_kmeans = pd.DataFrame(
+    kmeans.cluster_centers_,
+    columns = ['quantidade_m3']
+ )
+
+cent_kmeans.index.name = 'cluster'
+cent_kmeans
+
+# Centróides nos valores originais (para interpretação)
+cent_kmeans_original = df_mp_original.groupby('cluster_k')['quantidade_m3'].mean().reset_index()
+cent_kmeans_original.columns = ['cluster', 'quantidade_m3']
+cent_kmeans_original
+
+# Plotando Scatter em linha horizontal (apenas 1 variável quantidade_m3)
+plt.figure(figsize=(8,4), dpi=600)
+sns.scatterplot(
+    data=df_mp_original,
+    x='quantidade_m3',
+    y=[0]*len(df_mp_original),
+    hue='cluster_kmeans',
+    palette='viridis',
+    s=80
+)
+sns.scatterplot(
+    data=cent_kmeans_original,
+    x='quantidade_m3',
+    y=[0]*len(cent_kmeans_original),
+    color='red',
+    marker='X',
+    s=200,
+    label='Centróides'
+)
+plt.yticks([])
+plt.xlabel('Quantidade (m³)')
+plt.title('Clusters e Centróides - KMeans')
+plt.legend()
+plt.show()
+
+#       Análise Cluster 1 (266 observacoes) 
+df_soja_cluster1_k = df_mp_original [
+    (df_mp_original['cluster_kmeans'] == 1) &
+    (df_mp_original['produto'] == 'oleo de soja (glycine max)')
+]
+
+df_soja_cluster1_k.shape[0]
+
+df_soja_cluster1_k['quantidade_m3'].describe()
+df_mp_original['quantidade_m3'].describe(percentiles=[0.90,0.95,0.99])
+
+# Obs: Produto oleo de soja é predominante no cluster 1, com 265 observações, representando 99,62% dos dados.
+# O metodo K means apresenta mesmo comportamento na criação dos clusters que o metodo Hierarquico Aglomerativo.
+# Visto que, o cluster 1 apresenta os valores extremos de produção.
 
