@@ -23,6 +23,10 @@ Este projeto tem como objetivo identificar padrões e concentração na produç�
       - Complete Linkage
       - Average Linkage
    - Análise por dendrogramas e estatísticas por clusters
+   - Cluster Hierárquico Não Aglomerativo (K-means)
+      - Definição do número de clusters pelo Método Elbow (WCSS)
+      - Validação pelo Coeficiente de Silhueta
+      - Modelo final com 2 clusters (k-means++)
 
 3. **Conclusão comparativa entre métodos**
    - Single Linkage
@@ -35,17 +39,23 @@ Este projeto tem como objetivo identificar padrões e concentração na produç�
       - Forte predominância do óleo de soja (99% dos registros)
       - Mediana ~50x maior que a mediana geral.
    - Average Linkage
-      - Cluster 0 reúne volumes acima do percentil 95%, com forte presença acima do 99%.
-      - Predominância do óleo de soja (99% dos registros).
+      - Cluster 0 reúne volumes acima do percentil 95%, com forte presença acima do 99%
+      - Predominância do óleo de soja (99% dos registros)
       - Mediana ~40x maior que a mediana geral
       - A análise temporal indica:
          - Crescimento da produção média entre 2017 e 2021.
          - Queda pontual em 2022.
          - Retomada em 2023, mesmo com menor número de observações.
-
+   - K-means
+      - Cluster 1 concentra os maiores volumes de produção, acima do percentil 90% da base geral
+      - Forte predominância do óleo de soja (99,62% dos registros)
+      - Média do cluster (~77.845 m³) é ~9x maior que a média geral (~8.411 m³)
+      - Resultados convergem com os métodos hierárquicos aglomerativos, confirmando a separação entre observações extremas e o restante da base
+     
 4. **Síntese Geral**
    - Em todos os métodos, os maiores volumes estão concentrados em poucos registros
-   - O óleo de soja domina os clusters de alta escala
+   - O óleo de soja domina os clusters de alta escala em todos os modelos
+   - Os métodos hierárquicos e o K-means convergiram para a mesma estrutura de 2 clusters
    - A diferença expressiva entre medianas confirma alta heterogeneidade e concentração produtiva
   
 ## 📁 Estrutura do Repositório
@@ -53,7 +63,7 @@ Este projeto tem como objetivo identificar padrões e concentração na produç�
       ul-biodiesel-clustering/
       │
       ├── data/            # Dados brutos utilizados no projeto
-      ├── outputs/         # Gráficos gerados (histogramas, boxplots, dendrogramas)
+      ├── outputs/         # Gráficos gerados (histogramas, boxplots, dendrogramas, elbow, silhueta e scatter)
       ├── src/             # Scripts Python com ETL, EDA e Clustering
       │
       ├── .gitattributes
