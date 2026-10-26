@@ -8,9 +8,9 @@ from scipy.spatial.distance import pdist
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
-import pingouin as pg
 import plotly.express as px 
 import plotly.io as pio
+from unidecode import unidecode
 pio.renderers.default='browser'
 
 #%% Análise e padronização do arquivo
@@ -47,7 +47,6 @@ df_mp_original['estado'] = df_mp_original['estado'].str.lower()
 df_mp_original.head()
 
 # Removendo acentuação
-from unidecode import unidecode
 df_mp_original = df_mp_original.map(lambda x: unidecode(x) if isinstance(x, str) else x)
 df_mp_original.head()
 
@@ -73,7 +72,7 @@ fig_hist = px.histogram(
     nbins=30
 )
 
-fig_hist.write_html('hist_quantidade_m3_30.html')
+fig_hist.write_html('../outputs/hist_quantidade_m3_30.html')
 
 # Boxplot
 fig_box = px.box(
@@ -82,7 +81,7 @@ fig_box = px.box(
     title='Boxplot da Quantidade (m³)'
 )
 
-fig_box.write_html('boxplot_quantidade_m3.html')
+fig_box.write_html('../outputs/boxplot_quantidade_m3.html')
 # Obs: Tanto pelo hisograma quanto pelo boxplot, verifiquei escala divergente entre os dados
 
 # Padronização pelo Z score para adequação de escala
@@ -176,7 +175,7 @@ df_soja_cluster1_sing.groupby('ano')['quantidade_m3'].agg(['count', 'mean', 'max
 # Conclusão: O Cluster 1 reúne os maiores volumes de produção do conjunto de dados. Todos os valores desse grupo estão acima do percentil 99% da base geral, ou seja, fazem parte da faixa mais alta de produção observada.
 # O óleo de soja representa aproximadamente 85% dos produtos presentes no cluster, indicando forte predominância desse produto entre os maiores volumes.
 # Além disso, o óleo de milho corresponde ao maior valor registrado tanto dentro do cluster quanto em toda a base de dados.
-# A diferença entre a mediana do cluster (143.904. m³) e a mediana geral (1.849 m³) — cerca de 77 vezes maior — mostra que os dados são bastante heterogêneos, com a produção concentrada em poucas observações de grande escala.
+# A diferença entre a mediana do cluster (144.261 m³) e a mediana geral (1.849 m³) — cerca de 78 vezes maior — mostra que os dados são bastante heterogêneos, com a produção concentrada em poucas observações de grande escala.
 
 #%% Modelo 2 - Cluster Hierárquico Aglomerativo: métrica similaridade Dist Euclidiana e método encadeamento Complete Linkage
 
@@ -248,7 +247,7 @@ df_mp_original['quantidade_m3'].describe(percentiles=[0.90,0.95,0.99])
 # Conclusão: O Cluster 1 reúne os maiores volumes de produção do conjunto de dados. Os valores desse grupo estão acima do percentil 95% da base geral, pertencendo a faixa mais elevada de produçao observada.
 # O óleo de soja representa aproximadamente 99% (117 de 118 registros) dos produtos presentes no cluster, indicando forte predominância desse produto entre os maiores volumes.
 # Além disso, o óleo de milho corresponde ao maior valor registrado tanto dentro do cluster quanto em toda a base de dados.
-# A diferença entre a mediana do cluster (96.327 m³) e a mediana geral (1.849 m³) — cerca de 50 vezes maior — mostra que os dados são bastante heterogêneos, com a produção concentrada em poucas observações de grande escala.
+# A diferença entre a mediana do cluster (96.450 m³) e a mediana geral (1.849 m³) — cerca de 52 vezes maior — mostra que os dados são bastante heterogêneos, com a produção concentrada em poucas observações de grande escala.
 
 #%% Modelo 3 - Cluster Hierárquico Aglomerativo: métrica similaridade Dist Euclidiana e método encadeamento Average Linkage
 
@@ -259,7 +258,7 @@ print(sorted(Z_aver[:,2])[-10:]) # 10 maiores distancias de fusão, sendo o maio
 
 sch.dendrogram(Z_aver)
 
-plt.axhline(y=3, color='red', linestyle='--') # Utilizando valor 6 como linha de corte
+plt.axhline(y=3, color='red', linestyle='--') # Utilizando valor 3 como linha de corte
 plt.title('Dendrograma - Método Average Linkage')
 plt.xlabel('Observações')
 plt.ylabel('Distância Euclidiana')
@@ -317,14 +316,14 @@ df_soja_cluster0_aver['quantidade_m3'].describe()
 df_mp_original['quantidade_m3'].describe(percentiles=[0.90,0.95,0.99])
 
 
-# Conclusão: O Cluster 0 reúne os maiores volumes de produção do conjunto de dados. Os valores desse grupo estão acima do percentil 95% da base geral, com forte presença acima do percentil 99%, caracterizado como a faixa mais elevada de produçao observada.
+# Conclusão: O Cluster 0 reúne os maiores volumes de produção do conjunto de dados. Todos os valores desse grupo estão acima do percentil 90% da base geral (86% deles acima do percentil 95% e 17% acima do 99%), caracterizado como a faixa mais elevada de produçao observada.
 # A análise temporal indica crescimento contínuo da produção média de óleo de soja entre 2017 e 2021. 
 # Em 2022 há uma redução pontual na média, e em 2023, apesar do menor número de observações (29), houve retomada dos níveis de produção.
 # O óleo de soja representa aproximadamente 99% (275 de 276 registros) dos produtos presentes no cluster, indicando forte predominância desse produto entre os maiores volumes.
 # Além disso, o óleo de milho corresponde ao maior valor registrado tanto dentro do cluster quanto em toda a base de dados.
-# A diferença entre a mediana do cluster (96.327 m³) e a mediana geral (1.849 m³) — cerca de 40 vezes maior — mostra que os dados são bastante heterogêneos, com a produção concentrada em poucas observações de grande escala.
+# A diferença entre a mediana do cluster (73.430 m³) e a mediana geral (1.849 m³) — cerca de 40 vezes maior — mostra que os dados são bastante heterogêneos, com a produção concentrada em poucas observações de grande escala.
 
-#%% Modelo 4 - Cluster Hierárquico Não Aglomerativo K-means
+#%% Modelo 4 - Cluster Não Hierárquico (particional) K-means
 
 # Identificação da quantidade de clusters
 
