@@ -1,3 +1,2 @@
-# Forçar todos os arquivos .py a serem reconhecidos como Python no GitHub
-*.py linguist-language=Python
-*.html linguist-language=Python
+# Os mapas e gráficos interativos em HTML são saídas geradas pelo script: não contam como código
+outputs/*.html linguist-vendored
